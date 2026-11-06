@@ -14,6 +14,10 @@ through `flatpak update` and GNOME Software.
 flatpak install --user https://innovyria.github.io/flatpak/io.github._24icewolf42.markdown-editor.flatpakref
 ```
 
+A single-file bundle that installs offline and then updates from this repository is at
+`https://innovyria.github.io/flatpak/bundles/<app-id>.flatpak`
+(`flatpak install --user --bundle <file>`).
+
 Or add the whole repository:
 
 ```sh
@@ -28,7 +32,8 @@ flatpak remote-add --user --if-not-exists innovyria https://innovyria.github.io/
   [`apps.json`](apps.json) it takes the latest release's `x86_64` bundle, checks it against the
   release checksums, imports it into the OSTree repository, and signs the commit.
 - [`publish.py`](publish.py) then regenerates the signed summary, the AppStream data and static
-  deltas (keeping the last two versions), and writes the install files.
+  deltas (keeping the last two versions), writes the install files, and builds a signed
+  single-file bundle per app that names this repository as its update source.
 - The result is deployed to the `gh-pages` branch as a single commit.
 
 Commits and the summary are signed with the key `F6D1A2A3E1E0149DF213611D68D7D41936EF3AF6`

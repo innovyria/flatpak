@@ -108,6 +108,13 @@ def main() -> int:
             f"--title={TITLE}", f"--comment={COMMENT}", f"--homepage={BASE_URL}/", f"--default-branch={BRANCH}",
             str(repo))
         write_install_files(site, apps, gpg_home, key_id)
+        # Single-file bundles from the signed repository: they carry the
+        # commit signatures and name this repository as their update source.
+        bundles = site / "bundles"
+        bundles.mkdir(exist_ok=True)
+        for app in apps:
+            run("flatpak", "build-bundle", str(repo), str(bundles / f"{app['id']}.flatpak"), app["id"], BRANCH,
+                f"--repo-url={REPO_URL}", f"--runtime-repo={FLATHUB}", f"--gpg-keys={site / 'innovyria.gpg'}")
 
     if os.environ.get("GITHUB_OUTPUT"):
         with open(os.environ["GITHUB_OUTPUT"], "a") as out:
@@ -151,7 +158,9 @@ def write_install_files(site: Path, apps: list[dict], gpg_home: Path, key_id: st
             f'<li><h2><a href="https://github.com/{html.escape(app["source"])}">{html.escape(app["name"])}</a></h2>'
             f"<p>{html.escape(app['summary'])}</p>"
             f'<p><a class="button" href="{html.escape(app["id"])}.flatpakref">Install</a></p>'
-            f"<pre>flatpak install --user {BASE_URL}/{html.escape(app['id'])}.flatpakref</pre></li>"
+            f"<pre>flatpak install --user {BASE_URL}/{html.escape(app['id'])}.flatpakref</pre>"
+            f'<p>Single file that updates from this repository: <a href="bundles/{html.escape(app["id"])}.flatpak">'
+            f"{html.escape(app['id'])}.flatpak</a> (<code>flatpak install --user --bundle FILE</code>)</p></li>"
         )
     fingerprint = key_id.upper()
     (site / "index.html").write_text(f"""<!doctype html>
