@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Innovyria Flatpak repository</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; color: #241f31; }
+  @media (prefers-color-scheme: dark) { body { background: #1d1d20; color: #deddda; } a { color: #99c1f1; } }
+  ul { list-style: none; padding: 0; }
+  li { border: 1px solid #8884; border-radius: 12px; padding: 0 1rem; margin: 1rem 0; }
+  pre { background: #8882; padding: .6rem .8rem; border-radius: 8px; overflow-x: auto; }
+  .button { display: inline-block; padding: .4rem 1rem; border-radius: 8px; background: #3584e4; color: #fff; text-decoration: none; font-weight: 600; }
+  code { font-size: .9em; }
+</style>
+</head>
+<body>
+<h1>Innovyria Flatpak repository</h1>
+<p>Open-source apps from <a href="https://github.com/innovyria">Innovyria</a>, crafted by an autonomous software
+development lifecycle. Apps run on the GNOME runtime from Flathub and update with <code>flatpak update</code> or
+GNOME Software.</p>
+<ul>
+<li><h2><a href="https://github.com/24icewolf42/markdown-editor">Markdown Editor</a></h2><p>Write Markdown with a live preview: Mermaid, KaTeX, GitHub alerts and Marp slide decks</p><p><a class="button" href="io.github._24icewolf42.markdown-editor.flatpakref">Install</a></p><pre>flatpak install --user https://innovyria.github.io/flatpak/io.github._24icewolf42.markdown-editor.flatpakref</pre><p>Single file that updates from this repository: <a href="bundles/io.github._24icewolf42.markdown-editor.flatpak">io.github._24icewolf42.markdown-editor.flatpak</a> (<code>flatpak install --user --bundle FILE</code>)</p></li>
+</ul>
+<h2>Add the whole repository</h2>
+<pre>flatpak remote-add --user --if-not-exists innovyria https://innovyria.github.io/flatpak/innovyria.flatpakrepo</pre>
+<p>Commits and the repository summary are signed with the key <code>F6D1A2A3E1E0149DF213611D68D7D41936EF3AF6</code>
+(<a href="innovyria.asc">innovyria.asc</a>).</p>
+</body>
+</html>

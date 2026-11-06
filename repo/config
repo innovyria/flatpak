@@ -1,0 +1,10 @@
+[core]
+repo_version=1
+mode=archive-z2
+indexed-deltas=true
+
+[flatpak]
+title=Innovyria
+comment=Open-source apps from Innovyria
+homepage=https://innovyria.github.io/flatpak/
+default-branch=stable
