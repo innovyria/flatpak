@@ -34,7 +34,8 @@ flatpak remote-add --user --if-not-exists innovyria https://innovyria.github.io/
 - [`publish.py`](publish.py) then regenerates the signed summary, the AppStream data and static
   deltas (keeping the last two versions), writes the install files, and builds a signed
   single-file bundle per app that names this repository as its update source.
-- The result is deployed to the `gh-pages` branch as a single commit.
+- The result is stored in the `gh-pages` branch as a single commit (so pruned objects do not
+  pile up in history) and deployed to GitHub Pages with `actions/deploy-pages`.
 
 Commits and the summary are signed with the key `F6D1A2A3E1E0149DF213611D68D7D41936EF3AF6`
 ([`innovyria.asc`](innovyria.asc)). The private key exists only as the organization secret
