@@ -1,0 +1,59 @@
+# Imports new app releases into the signed OSTree repository and deploys it
+# to GitHub Pages (branch gh-pages, replaced by a single commit each time so
+# pruned objects do not pile up in git history).
+name: Publish
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Regenerate the summary and install files even without a new release
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: |
+          for tool in python3 git gpg ostree flatpak; do command -v "$tool" >/dev/null || missing=1; done
+          [ -z "${missing:-}" ] || dnf install -y --setopt=install_weak_deps=False python3 git gnupg2 ostree
+          git config --global --add safe.directory '*'
+      - name: Current site
+        run: git clone --quiet --depth 1 --branch gh-pages "https://github.com/$GITHUB_REPOSITORY" site || mkdir -p site
+      - name: Import releases and sign
+        id: publish
+        env:
+          FLATPAK_GPG_PRIVATE_KEY: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
+          FLATPAK_GPG_KEY_ID: ${{ secrets.FLATPAK_GPG_KEY_ID }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          force=""
+          if [ "${{ github.event_name }}" = push ] || [ "${{ inputs.force }}" = true ]; then force=--force; fi
+          python3 publish.py site $force
+      - name: Deploy to gh-pages
+        if: steps.publish.outputs.changed == 'true'
+        run: |
+          cd site
+          rm -rf .git
+          git init --quiet --initial-branch=gh-pages
+          git add --all
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit --quiet -m "Publish repository"
+          git push --force --quiet "https://x-access-token:${{ github.token }}@github.com/$GITHUB_REPOSITORY" gh-pages
