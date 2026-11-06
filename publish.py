@@ -70,6 +70,10 @@ def main() -> int:
                    input=os.environ["FLATPAK_GPG_PRIVATE_KEY"].encode(), check=True)
     sign = [f"--gpg-sign={key_id}", f"--gpg-homedir={gpg_home}"]
 
+    # git (gh-pages) does not keep empty directories; OSTree needs them.
+    if (repo / "config").exists():
+        for d in ("refs/heads", "refs/remotes", "refs/mirrors", "tmp/cache", "state", "extensions"):
+            (repo / d).mkdir(parents=True, exist_ok=True)
     if not (repo / "config").exists():
         run("ostree", "init", "--mode=archive-z2", f"--repo={repo}")
         changed = True
