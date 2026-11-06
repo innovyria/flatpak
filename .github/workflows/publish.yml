@@ -1,6 +1,7 @@
 # Imports new app releases into the signed OSTree repository and deploys it
-# to GitHub Pages (branch gh-pages, replaced by a single commit each time so
-# pruned objects do not pile up in git history).
+# to GitHub Pages. The branch gh-pages keeps the repository between runs
+# (replaced by a single commit each time, so pruned objects do not pile up
+# in git history); Pages is deployed from it with actions/deploy-pages.
 name: Publish
 
 on:
@@ -17,6 +18,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: publish
@@ -25,6 +28,9 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
       options: --privileged
@@ -57,3 +63,10 @@ jobs:
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit --quiet -m "Publish repository"
           git push --force --quiet "https://x-access-token:${{ github.token }}@github.com/$GITHUB_REPOSITORY" gh-pages
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.publish.outputs.changed == 'true'
+        with:
+          path: site
+      - id: deploy
+        if: steps.publish.outputs.changed == 'true'
+        uses: actions/deploy-pages@v4
